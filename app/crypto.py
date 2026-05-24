@@ -1,5 +1,3 @@
-import hashlib
-
 # RFC 7919 ffdhe2048 — p is a 2048-bit safe prime.
 P = int(
     "FFFFFFFFFFFFFFFFADF85458A2BB4A9AAFDC5620273D3CF1"
@@ -21,26 +19,11 @@ Q = (P - 1) // 2
 
 G = 2
 
-# Byte length of a group element, used for fixed-width serialization in H().
+# Byte length of a group element.
 BYTE_LEN = (P.bit_length() + 7) // 8
 
-# Byte length of the challenge e (t = 256 bits, see lab script §5.5).
+# Byte length of the challenge e (t = 256 bits).
 CHALLENGE_BYTES = 32
-
-
-def H(*parts: bytes) -> int:
-    """
-    SHA-256 of concatenated byte strings, returned as an int.
-
-    Caller is responsible for serializing inputs to bytes with the right
-    width (typically BYTE_LEN). This keeps H() dumb and unambiguous:
-    same bytes in -> same int out, regardless of which protocol calls it.
-    """
-    h = hashlib.sha256()
-    for part in parts:
-        h.update(part)
-    return int.from_bytes(h.digest(), "big")
-
 
 def int_to_hex(n: int, byte_len: int = BYTE_LEN) -> str:
     """Encode int as lowercase hex, zero-padded to byte_len bytes."""
@@ -55,8 +38,6 @@ def hex_to_int(s: str) -> int:
     """
     if not isinstance(s, str) or not s:
         raise ValueError("expected non-empty hex string")
-    # int() accepts both upper and lower case; we don't enforce case here,
-    # we just require it to parse cleanly as base 16.
     try:
         return int(s, 16)
     except ValueError as e:
@@ -64,9 +45,5 @@ def hex_to_int(s: str) -> int:
 
 
 def in_group(n: int) -> bool:
-    """
-    Check n ∈ Z*_p, i.e. 1 < n < p.
-    (n == 0 and n == 1 are excluded as trivial, n >= p is reduced mod p
-    by an attacker trivially, so we reject both.)
-    """
+    """Check n in Z*_p (1 < n < p)."""
     return 1 < n < P
