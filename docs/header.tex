@@ -1,0 +1,38 @@
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage{unicode-math}
+\usepackage{newunicodechar}
+\usepackage[nobottomtitles*]{titlesec}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+\setmainfont{Palatino}
+\setmathfont{STIX Two Math}
+\setmonofont{Menlo}[Scale=0.9]
+
+% Allow breaks at more characters in URLs
+\renewcommand\UrlBreaks{\do\/\do\-\do\.\do\_\do\?\do\&\do\=\do\#\do\:\do\@\do\%}
+
+% Stretch as last resort
+\emergencystretch=2em
+
+% Full-width horizontal rules
+\let\oldrule\rule
+\renewcommand{\rule}[2]{\noindent\oldrule{\linewidth}{0.4pt}}
+
+\newunicodechar{→}{\ensuremath{\rightarrow}}
+\newunicodechar{≡}{\ensuremath{\equiv}}
+\newunicodechar{≠}{\ensuremath{\neq}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∣}{\ensuremath{\mid}}
+\newunicodechar{∥}{\ensuremath{\parallel}}
+\newunicodechar{ℰ}{\ensuremath{\mathcal{E}}}
+\newunicodechar{𝒮}{\ensuremath{\mathcal{S}}}
+\newunicodechar{Σ}{\ensuremath{\Sigma}}
+\newunicodechar{φ}{\ensuremath{\varphi}}
+\newunicodechar{ℤ}{\ensuremath{\mathbb{Z}}}
+
+

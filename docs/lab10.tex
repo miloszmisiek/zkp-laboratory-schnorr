@@ -1,0 +1,620 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{xcolor}
+\usepackage{xurl}
+\usepackage{unicode-math}
+\usepackage{newunicodechar}
+\setmainfont{Palatino}
+\setmathfont{STIX Two Math}
+\setmonofont{Menlo}[Scale=0.9]
+
+% Allow breaks at more characters in URLs
+\renewcommand\UrlBreaks{\do\/\do\-\do\.\do\_\do\?\do\&\do\=\do\#\do\:\do\@\do\%}
+
+% Stretch as last resort
+\emergencystretch=2em
+
+% Full-width horizontal rules
+\let\oldrule\rule
+\renewcommand{\rule}[2]{\noindent\oldrule{\linewidth}{0.4pt}}
+
+\newunicodechar{→}{\ensuremath{\rightarrow}}
+\newunicodechar{≡}{\ensuremath{\equiv}}
+\newunicodechar{≠}{\ensuremath{\neq}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∣}{\ensuremath{\mid}}
+\newunicodechar{∥}{\ensuremath{\parallel}}
+\newunicodechar{ℰ}{\ensuremath{\mathcal{E}}}
+\newunicodechar{𝒮}{\ensuremath{\mathcal{S}}}
+\newunicodechar{Σ}{\ensuremath{\Sigma}}
+\newunicodechar{φ}{\ensuremath{\varphi}}
+\newunicodechar{ℤ}{\ensuremath{\mathbb{Z}}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\section{Laboratorium nr 10}\label{laboratorium-nr-10}
+
+\subsection{Protokoły dowodzenia z wiedzą zerową --- interaktywny
+protokół
+Schnorra}\label{protokoux142y-dowodzenia-z-wiedzux105-zerowux105-interaktywny-protokuxf3ux142-schnorra}
+
+\textbf{Liczba punktów:} 3pkt + \textcolor{green}{2pkt}
+
+\textbf{Forma zaliczenia:} live demo + pytania kontrolne
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{1. Opis laboratorium}\label{opis-laboratorium}
+
+Celem laboratorium jest poznanie i implementacja interaktywnego
+protokołu dowodzenia z wiedzą zerową (\emph{zero-knowledge proof of
+knowledge}, ZKPoK) na przykładzie protokołu identyfikacji Schnorra
+(Schnorr 1989). W ramach laboratorium:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Zaimplementujesz interaktywny protokół Schnorra w grupie cyklicznej
+  rzędu pierwszego \(\mathbb{Z}^*_p\);
+\item
+  Podepniesz go jako klient do serwera autoryzacji udostępnianego przez
+  prowadzącego i wykonasz uwierzytelnienie bez przesyłania hasła.
+\end{enumerate}
+
+\subsubsection{1.1. Język protokołów
+ZKP}\label{jux119zyk-protokoux142uxf3w-zkp}
+
+Protokół dowodzenia z wiedzą zerową jest dwustronnym protokołem między
+\textbf{Proverem} \(P\) a \textbf{Verifierem} \(V\). Centralnym pojęciem
+jest \textbf{relacja} \(R\) określająca, co znaczy ``dowód poprawny'':
+
+\begin{itemize}
+\tightlist
+\item
+  \(x\) --- \emph{statement} (wypowiedź publiczna, wejście jawne);
+\item
+  \(w\) --- \emph{witness} (świadek, sekret znany tylko Proverowi);
+\item
+  \(R(x, w) \in \{0, 1\}\) --- funkcja relacji; Prover twierdzi: ``znam
+  \(w\) takie, że \(R(x, w) = 1\)'';
+\item
+  \(b \in \{0, 1\}\) --- \emph{decision bit} wyjściowy Verifiera (\(1\)
+  = accept, \(0\) = reject).
+\end{itemize}
+
+Dla protokołu Schnorra relacja jest następująca:
+
+\[R_{\mathrm{DLP}} = \big\{\, ((g, p, q, y),\, x) \;:\; y \equiv g^x \pmod{p} \,\big\}.\]
+
+Statement to czwórka \((g, p, q, y)\), a witness to logarytm dyskretny
+\(x\). Prover dowodzi znajomości \(x\) bez ujawniania jego wartości.
+
+\subsubsection{1.2. Trzy własności
+bezpieczeństwa}\label{trzy-wux142asnoux15bci-bezpieczeux144stwa}
+
+Protokół ZKP musi spełniać trzy własności, z których każda chroni przed
+innym typem ataku i ma odrębną definicję formalną.
+
+\textbf{(1) Completeness (zupełność).} Jeśli \(R(x, w) = 1\) i obie
+strony postępują zgodnie z protokołem, to \(V\) wyprowadza \(b = 1\) z
+prawdopodobieństwem \(1\).
+
+\textbf{(2) Knowledge Soundness (KSND, niezawodność wiedzy).} Chroni
+przed nieuczciwym Proverem \(P^*\). Jeśli \(P^*\) przekonuje \(V\) z
+istotnym prawdopodobieństwem, to \textbf{istnieje algorytm Knowledge
+Extractor} \(\mathcal{E}\), który mając dostęp do \(P^*\) potrafi
+wydobyć poprawnego świadka \(w^*\). Operacyjnie: dwa akceptowane
+transkrypty \((a, e_1, z_1)\) i \((a, e_2, z_2)\) z różnymi wyzwaniami
+\(e_1 \neq e_2\) pozwalają wyliczyć \(w\). To dowodzi, że \(P^*\)
+\emph{musiał} znać sekret.
+
+\textbf{(3) Zero-Knowledge (ZK).} Chroni przed nieuczciwym Verifierem
+\(V^*\). \textbf{Istnieje algorytm Simulator} \(\mathcal{S}\), który
+mając tylko statement \(x\) (bez witness \(w\)) produkuje transkrypty
+\emph{nieodróżnialne} od transkryptów prawdziwej interakcji. To dowodzi,
+że \(V^*\) nie uzyskuje żadnej informacji o \(w\), której nie mógłby
+uzyskać sam, znając tylko \(x\).
+
+\begin{quote}
+\textbf{Uwaga.} Klasyczna definicja ZK zakłada uczciwego Verifiera (HVZK
+--- \emph{Honest Verifier Zero-Knowledge}). Pełne ZK wobec dowolnego
+\(V^*\) wymaga dodatkowych technik (rewinding, Fischlin transform). W
+tym laboratorium pracujemy z HVZK.
+\end{quote}
+
+\subsubsection{1.3. Σ-protokoły}\label{ux3c3-protokoux142y}
+
+Protokół Schnorra należy do rodziny \textbf{Σ-protokołów}:
+trzy-wiadomościowych protokołów \emph{publicznych monet} (public-coin),
+w których wyzwanie \(V\) jest losowane jawnie. Schemat:
+
+\[
+\begin{array}{lrcl}
+\text{Krok 1 (commitment):} & P \to V & : & a \\
+\text{Krok 2 (challenge):}  & V \to P & : & e \\
+\text{Krok 3 (response):}   & P \to V & : & z
+\end{array}
+\]
+
+Verifier akceptuje \textbf{wtedy i tylko wtedy}, gdy
+\(\varphi(x, a, e, z) = 1\) dla pewnego predykatu \(\varphi\).
+
+\subsubsection{1.4. Protokół identyfikacji
+Schnorra}\label{protokuxf3ux142-identyfikacji-schnorra}
+
+\textbf{Parametry publiczne:} liczba pierwsza \(p\), liczba pierwsza
+\(q \mid p-1\), generator \(g\) podgrupy rzędu \(q\) w
+\(\mathbb{Z}^*_p\). Zalecane: \(|p| \geq 2048\) b. W laboratorium
+używamy parametrów RFC 7919 ffdhe2048 (sekcja 5.1).
+
+\textbf{Statement i witness:} \(x_{\mathrm{pub}} = (g, p, q, y)\);
+witness \(w = x_{\mathrm{priv}}\), takie że
+\(y = g^{x_{\mathrm{priv}}} \bmod p\).
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4167}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Krok
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Strona
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Operacja
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1. Commitment & \(P\) & losuje \(r \in_R \{1, \ldots, q-1\}\); oblicza
+\(a = g^r \bmod p\); wysyła \(a\) \\
+2. Challenge & \(V\) & losuje \(e \in_R \{0, \ldots, 2^t-1\}\); wysyła
+\(e\) \\
+3. Response & \(P\) & oblicza
+\(z = (r + e \cdot x_{\mathrm{priv}}) \bmod q\); wysyła \(z\) \\
+4. Verify & \(V\) & akceptuje wtw.
+\(g^z \equiv a \cdot y^e \pmod{p}\) \\
+\end{longtable}
+}
+
+\textbf{Completeness:}
+
+\[g^z = g^{r + e \cdot x_{\mathrm{priv}}} = g^r \cdot \big(g^{x_{\mathrm{priv}}}\big)^e = a \cdot y^e \pmod{p}.\]
+
+\textbf{Knowledge Extractor (intuicja).} Z dwóch akceptowanych
+transkryptów \((a, e_1, z_1)\) i \((a, e_2, z_2)\) z różnymi wyzwaniami
+\(e_1 \neq e_2\) wynika:
+
+\[z_1 - z_2 \equiv (e_1 - e_2) \cdot x_{\mathrm{priv}} \pmod{q},\]
+
+skąd:
+
+\[x_{\mathrm{priv}} = (z_1 - z_2) \cdot (e_1 - e_2)^{-1} \bmod q.\]
+
+Konstrukcja Extractora dowodzi, że Prover przekonujący Verifiera
+dwukrotnie \emph{musi} znać \(x_{\mathrm{priv}}\). Ta sama algebra leży
+u podstaw ataku na podpisy Schnorra/ECDSA z powtórzonym nonce (między
+innymi incydent Sony PlayStation 3, 2010) --- temat omawiany na
+wykładzie nr 10.
+
+\subsubsection{1.5. Zastosowania w systemach
+produkcyjnych}\label{zastosowania-w-systemach-produkcyjnych}
+
+Protokół zaimplementowany w niniejszym laboratorium jest dydaktycznym
+przedstawieniem matematyki, która stanowi rdzeń następujących systemów
+używanych komercyjnie:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Ed25519} (RFC 8032, NIST FIPS 186-5) --- wariant Schnorra na
+  krzywej eliptycznej Edwards \(\mathrm{Ed}25519\). Standard SSH, TLS
+  1.3, Signal, WhatsApp, WireGuard, Apple Passkeys, Android Keystore.
+\item
+  \textbf{Bitcoin Taproot} (BIP-340, aktywne od 2021 r.) --- Schnorr na
+  krzywej secp256k1, używany do każdej nowej transakcji Bitcoin.
+\item
+  \textbf{FIDO2 / WebAuthn} --- globalny standard uwierzytelnienia bez
+  haseł (Google, Apple, Microsoft); pod spodem ECDSA lub Ed25519.
+\item
+  \textbf{Konsensus blockchain} --- Solana, Polkadot, Cardano używają
+  wariantów Schnorra do podpisywania transakcji w sieciach o
+  przepustowości rzędu \(10^4\)--\(10^5\) tps. W każdym z tych systemów
+  występują dokładnie te same trzy kroki: commitment, challenge,
+  response. Różni je \textbf{grupa}, w której działają, oraz
+  \textbf{sposób generowania wyzwania} \(e\). W zapisie multiplikatywnym
+  (jak w niniejszym laboratorium) weryfikacja ma postać:
+\end{itemize}
+
+\[g^z \equiv a \cdot y^e \pmod{p}.\]
+
+W zapisie addytywnym dla krzywych eliptycznych identyczna zależność
+wygląda następująco:
+
+\[z \cdot G \;=\; R \,+\, e \cdot Y,\]
+
+gdzie \(G\) jest punktem bazowym krzywej,
+\(Y = x_{\mathrm{priv}} \cdot G\) jest kluczem publicznym,
+\(R = r \cdot G\) jest commitment'em, a operacje \(+\) i \(\cdot\) to
+odpowiednio dodawanie punktów oraz mnożenie punktu przez skalar.
+Algebraicznie jest to ta sama tożsamość, co weryfikacja z sekcji 1.4 ---
+różni się tylko notacją podyktowaną wyborem grupy.
+
+Sposób uzyskiwania wyzwania w wersji nieinteraktywnej (podpis cyfrowy)
+wykorzystuje transformację Fiat-Shamir:
+
+\[e = H(\mathrm{pk} \,\|\, a \,\|\, m),\]
+
+gdzie \(H\) jest kryptograficzną funkcją skrótu (SHA-256, SHA-512 lub w
+przypadku Ed25519 --- SHA-512 z dodatkową strukturą). Pominięcie
+\(\mathrm{pk}\), \(a\) lub \(m\) w wejściu \(H\) otwiera atak; temat
+jest omawiany na wykładzie nr 10.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{2. Materiały}\label{materiaux142y}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  C.-P. Schnorr, \emph{Efficient Identification and Signatures for Smart
+  Cards}, CRYPTO '89,
+  https://link.springer.com/chapter/10.1007/0-387-34805-0\_22
+\item
+  A. Menezes, P. van Oorschot, S. Vanstone, \emph{Handbook of Applied
+  Cryptography}, rozdz. 10,
+  http://cacr.uwaterloo.ca/hac/about/chap10.pdf
+\item
+  D. Boneh, V. Shoup, \emph{A Graduate Course in Applied Cryptography},
+  rozdz. 19, https://toc.cryptobook.us/
+\item
+  A. Fiat, A. Shamir, \emph{How to Prove Yourself}, CRYPTO '86,
+  https://link.springer.com/chapter/10.1007/3-540-47721-7\_12
+\item
+  S. Goldwasser, S. Micali, C. Rackoff, \emph{The Knowledge Complexity
+  of Interactive Proof-Systems}, STOC '85,
+  https://doi.org/10.1145/22145.22178
+\item
+  T. Silde, A. Takahashi, \emph{Zero Knowledge Proofs: Challenges,
+  Applications, and Real-world Deployment}, NIST Workshop on
+  Privacy-Enhancing Cryptography 2024,
+  https://csrc.nist.gov/Events/2024/wpec2024
+\item
+  D. Pointcheval, J. Stern, \emph{Security Arguments for Digital
+  Signatures and Blind Signatures}, Journal of Cryptology 2000,
+  https://link.springer.com/article/10.1007/s001450010003
+\item
+  M. Green, \emph{Zero Knowledge Proofs: An Illustrated Primer},
+  https://blog.cryptographyengineering.com/2014/11/27/zero-knowledge-proofs-illustrated-primer/
+\item
+  BIP-340: \emph{Schnorr Signatures for secp256k1},
+  https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
+\item
+  RFC 7919: \emph{Negotiated Finite Field Diffie-Hellman Ephemeral
+  Parameters for Transport Layer Security},
+  https://www.rfc-editor.org/rfc/rfc7919.html
+\item
+  RFC 8032: \emph{Edwards-Curve Digital Signature Algorithm (EdDSA)},
+  https://www.rfc-editor.org/rfc/rfc8032.html
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{3. Zadanie do wykonania}\label{zadanie-do-wykonania}
+
+Napisz aplikację realizującą poniższe zadanie. Język programowania
+\textbf{dowolny}. Wymagana jest obsługa arytmetyki dużych liczb.
+
+Klient referencyjny w języku Python (\texttt{client.py}) zawiera gotowy
+szkielet HTTP, parametry grupy oraz puste funkcje kryptograficzne
+(oznaczone \texttt{TODO\ STUDENT}) do uzupełnienia. Plik dostępny jest
+na zajęciach.
+
+\subsubsection{\texorpdfstring{3.1. Zadanie 1 (3 pkt +
+\textcolor{green}{2 pkt}) --- implementacja interaktywnego protokołu
+Schnorra i klienta
+uwierzytelniającego}{3.1. Zadanie 1 (3 pkt + ) --- implementacja interaktywnego protokołu Schnorra i klienta uwierzytelniającego}}\label{zadanie-1-3-pkt-implementacja-interaktywnego-protokoux142u-schnorra-i-klienta-uwierzytelniajux105cego}
+
+Zaimplementuj protokół identyfikacji Schnorra zgodnie z opisem w sekcji
+1.4 oraz podepnij go jako klienta do serwera pokazowego.
+
+\textbf{Część A: lokalna implementacja.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Pobierz parametry \((p, q, g)\) z serwera (\texttt{GET\ /params}).
+  Zweryfikuj lokalnie:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \(g^q \equiv 1 \pmod{p}\) (generator ma rząd dzielący \(q\));
+  \item
+    \(g \neq 1\).
+  \end{itemize}
+\item
+  Zaimplementuj funkcję \texttt{keygen()} zwracającą parę
+  \((x_{\mathrm{priv}}, y)\), gdzie
+  \(x_{\mathrm{priv}} \in_R \{1, \ldots, q-1\}\) oraz
+  \(y = g^{x_{\mathrm{priv}}} \bmod p\).
+\item
+  Zaimplementuj cztery rozdzielne funkcje protokołu:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{prover\_commit()\ →\ (r,\ a)};
+  \item
+    \texttt{verifier\_challenge(t\_bits)\ →\ e};
+  \item
+    \texttt{prover\_response(r,\ e,\ x\_priv)\ →\ z};
+  \item
+    \texttt{verifier\_check(y,\ a,\ e,\ z)\ →\ bool}.
+  \end{itemize}
+\item
+  Wykonaj testy lokalne:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{test completeness:} 100 przebiegów z poprawnym kluczem ---
+    wszystkie akceptowane;
+  \item
+    \textbf{test odporności:} mutacja \(z\) lub \(a\) o \(1\) →
+    odrzucenie;
+  \item
+    \textbf{test z fałszywym kluczem:} Prover używa
+    \(x' \neq x_{\mathrm{priv}}\) → odrzucenie.
+  \end{itemize}
+\end{enumerate}
+
+\textbf{Część B: klient uwierzytelniający.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Zaimplementuj \texttt{register(username,\ y)} --- wywołanie
+  \texttt{POST\ /v1/register}.
+\item
+  Zaimplementuj \texttt{login(username,\ x\_priv)} jako pełną sekwencję:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    obliczenie \((r, a)\) lokalnie przez \texttt{prover\_commit()};
+  \item
+    \texttt{POST\ /v1/login/start\ \{username,\ a\}} --- otrzymanie
+    wyzwania \(e\) oraz \texttt{session\_id};
+  \item
+    obliczenie \(z = (r + e \cdot x_{\mathrm{priv}}) \bmod q\) lokalnie
+    przez \texttt{prover\_response};
+  \item
+    \texttt{POST\ /v1/login/finish\ \{session\_id,\ z\}} --- otrzymanie
+    tokenu sesji (status \(200\)) lub odrzucenia (\(401\)).
+  \end{itemize}
+\end{enumerate}
+
+\textbf{Demonstracja do oceny.} Live demo przed prowadzącym składa się z
+trzech kroków wykonanych na żywo na uruchomionym kliencie:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Rejestracja konta studenta (np. \texttt{nazwisko@lab}) --- odpowiedź
+  \(200\);
+\item
+  Udane uwierzytelnienie --- odpowiedź \(200\) z tokenem sesji;
+\item
+  Próba uwierzytelnienia z podstawioną fałszywą wartością \(z\) (np.
+  zwiększoną o \(1\)) --- odpowiedź \(401\).
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{4. Pytania kontrolne}\label{pytania-kontrolne}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Dlaczego wyzwanie \(e\) musi być losowane \emph{po} wysłaniu
+  commitment \(a\)? Jakie konsekwencje miałoby odwrócenie kolejności?
+\item
+  Klucz prywatny \(x_{\mathrm{priv}}\) nigdy nie opuszcza klienta ---
+  serwer otrzymuje tylko \(y\), \(a\) i \(z\). Jaką to ma przewagę nad
+  uwierzytelnieniem hasłem w sytuacji, gdy serwer zostaje
+  skompromitowany (np. wyciekła baza danych)?
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{5. Wskazówki
+implementacyjne}\label{wskazuxf3wki-implementacyjne}
+
+\subsubsection{5.1. Parametry grupy (RFC 7919
+ffdhe2048)}\label{parametry-grupy-rfc-7919-ffdhe2048}
+
+Identyczne wartości używa serwer pokazowy. Pełna postać liczbowa w pliku
+\texttt{client.py}. Schematycznie:
+
+\[
+\begin{aligned}
+p &= \mathtt{FFFFFFFF}\ldots\mathtt{FFFFFFFF} \quad (2048 \text{ bitów}) \\
+q &= (p - 1)/2 \quad (2047 \text{ bitów},\ \textit{safe prime}) \\
+g &= 2
+\end{aligned}
+\]
+
+Wymagana lokalna weryfikacja: \(g^q \equiv 1 \pmod{p}\) oraz
+\(g \neq 1\).
+
+\subsubsection{5.2. Serializacja liczb przy komunikacji z
+serwerem}\label{serializacja-liczb-przy-komunikacji-z-serwerem}
+
+Wszystkie wartości liczbowe przesyłane są w formacie \textbf{lowercase
+hex string} (bez prefiksu \texttt{0x}). Konwencja jednolita dla obu
+kierunków komunikacji. Format JSON Number nie jest stosowany z uwagi na
+\(53\)-bitowe ograniczenie precyzji.
+
+\subsubsection{5.3. Losowanie liczb}\label{losowanie-liczb}
+
+Do losowania liczb stosuj wyłącznie kryptograficznie bezpieczne
+generatory:
+
+\begin{itemize}
+\tightlist
+\item
+  Python \(\geq 3.8\): moduł \texttt{secrets}, funkcja
+  \texttt{secrets.randbelow(q\ -\ 1)\ +\ 1};
+\item
+  Java: \texttt{java.security.SecureRandom};
+\item
+  C/C++: \texttt{/dev/urandom}, biblioteka GMP z dobrym źródłem
+  entropii;
+\item
+  Rust: crate \texttt{rand} z \texttt{OsRng}.
+\end{itemize}
+
+Nie należy używać generatorów pseudolosowych przeznaczonych do
+zastosowań niekryptograficznych (\texttt{random.randint} w Pythonie,
+\texttt{java.util.Random}, \texttt{rand()} w C).
+
+\subsubsection{5.4. Arytmetyka modularna}\label{arytmetyka-modularna}
+
+Najczęstszym źródłem błędów w implementacji protokołu jest pomylenie
+modulo. Obowiązuje zasada:
+
+\begin{itemize}
+\tightlist
+\item
+  bazę redukujemy \(\bmod\ p\) (operacje na elementach grupy
+  \(\mathbb{Z}^*_p\));
+\item
+  wykładniki redukujemy \(\bmod\ q\) (operacje w pierścieniu
+  \(\mathbb{Z}_q\), rząd podgrupy).
+\end{itemize}
+
+W szczególności: \(z = (r + e \cdot x_{\mathrm{priv}}) \bmod q\),
+\textbf{nie} \(\bmod\ p\).
+
+\subsubsection{5.5. Długość
+wyzwania}\label{dux142ugoux15bux107-wyzwania}
+
+W laboratorium przyjmujemy \(t = 256\) bitów, tj.
+\(e \in_R \{0, \ldots, 2^{256}-1\}\). Wartość zgodna z długością wyjścia
+SHA-256. Błąd \emph{knowledge soundness} wynosi \(2^{-256}\) na sesję.
+Wartość ta jest stała i nie jest udostępniana przez \texttt{/params} ---
+klient zakłada ją z góry.
+
+\subsubsection{5.6. Endpointy serwera
+pokazowego}\label{endpointy-serwera-pokazowego}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4348}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3478}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2174}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Endpoint
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Metoda
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cel
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{/params} & GET & parametry grupy \((p, q, g)\) \\
+\texttt{/v1/register} & POST & rejestracja konta z kluczem publicznym
+\(y\) \\
+\texttt{/v1/login/start} & POST & rozpoczęcie uwierzytelnienia
+(commitment \(a\)) \\
+\texttt{/v1/login/finish} & POST & zakończenie uwierzytelnienia
+(response \(z\)) \\
+\end{longtable}
+}
+
+Adres serwera podaje prowadzący na zajęciach.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{Termin oddania zadania:} do laboratorium nr 12 włącznie. Demo po
+tym terminie nie jest punktowane.
+
+\end{document}
