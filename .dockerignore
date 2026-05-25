@@ -13,5 +13,6 @@ __pycache__
 docs
 README.md
 client.py
+my_client.py
 Dockerfile
 .dockerignore
