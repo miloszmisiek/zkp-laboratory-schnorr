@@ -1,0 +1,29 @@
+services:
+  lab-server:
+    build: .
+    image: lab-server:latest
+    container_name: lab-server
+    restart: unless-stopped
+    environment:
+      RATE_LIMIT: "${RATE_LIMIT:-60/minute}"
+    ports:
+      - "127.0.0.1:8000:8000"
+    profiles: ["prod"]
+
+  lab-server-dev:
+    build: .
+    image: lab-server:latest
+    container_name: lab-server-dev
+    command:
+      - fastapi
+      - dev
+      - app/main.py
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./app:/app/app
+    profiles: ["dev"]

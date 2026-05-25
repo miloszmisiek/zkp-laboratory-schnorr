@@ -1,0 +1,17 @@
+.venv
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+.git
+.gitignore
+.python-version
+.env
+.env.*
+.idea
+.vscode
+docs
+README.md
+client.py
+Dockerfile
+.dockerignore
