@@ -1,8 +1,13 @@
 import json
+import os
 import secrets
 import sys
 import urllib.error
 import urllib.request
+
+import certifi
+
+os.environ.setdefault("SSL_CERT_FILE", certifi.where())
 
 P = int(
     "FFFFFFFFFFFFFFFFADF85458A2BB4A9AAFDC5620273D3CF1"

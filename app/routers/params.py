@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.crypto import BYTE_LEN, G, P, Q, int_to_hex
 
-router = APIRouter(prefix="/params", tags=["params"])
+router = APIRouter(prefix="/v1/params", tags=["v1"])
 
 
 @router.get("/")

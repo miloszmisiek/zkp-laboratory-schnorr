@@ -46,7 +46,7 @@ Rate limit is configurable via the `RATE_LIMIT` env var (default `300/minute` pe
 
 | Endpoint              | Method | Purpose                                     |
 |-----------------------|--------|---------------------------------------------|
-| `/params/`            | GET    | group parameters `(p, q, g)` as padded hex  |
+| `/v1/params/`         | GET    | group parameters `(p, q, g)` as padded hex  |
 | `/v1/register`        | POST   | register a public key under a username      |
 | `/v1/login/start`     | POST   | begin authentication: send commitment `a`   |
 | `/v1/login/finish`    | POST   | finish authentication: send response `z`    |
@@ -60,7 +60,7 @@ app/
   state.py               in-memory ServerState (users + sessions) + FastAPI dependency
   main.py                FastAPI app, lifespan, router includes
   routers/
-    params.py            GET /params
+    params.py            GET /v1/params
     v1.py                register, login/start, login/finish
 client.py                student-facing reference client (with TODO stubs)
 docs/
