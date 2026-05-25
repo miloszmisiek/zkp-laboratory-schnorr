@@ -23,7 +23,7 @@ G = 2
 BYTE_LEN = (P.bit_length() + 7) // 8
 T_BITS = 256
 
-SERVER_URL = "http://127.0.0.1:8000"
+SERVER_URL = "https://homehub.tail270483.ts.net"
 
 
 def int_to_hex(n: int, byte_len: int = BYTE_LEN) -> str:
@@ -43,6 +43,7 @@ def _get(path: str) -> tuple[int, dict]:
 
 
 def _post(path: str, body: dict) -> tuple[int, dict]:
+    """POST `body` as JSON. Returns (status, body) for all responses; does not raise on 4xx/5xx."""
     req = urllib.request.Request(
         SERVER_URL + path,
         data=json.dumps(body).encode(),

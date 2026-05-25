@@ -5,7 +5,7 @@ services:
     container_name: lab-server
     restart: unless-stopped
     environment:
-      RATE_LIMIT: "${RATE_LIMIT:-60/minute}"
+      RATE_LIMIT: "${RATE_LIMIT:-300/minute}"
     ports:
       - "127.0.0.1:8000:8000"
     profiles: ["prod"]

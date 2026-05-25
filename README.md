@@ -18,6 +18,30 @@ uv run fastapi run app/main.py     # production-mode server
 
 Interactive API docs: <http://127.0.0.1:8000/docs>.
 
+## Deploy (Docker + Tailscale Funnel)
+
+The Ubuntu host runs the container with compose and exposes it to the public internet only for the duration of the lab via Tailscale Funnel.
+
+Build / start / stop the container:
+
+```bash
+docker compose --profile prod up -d --build    # start (build if needed)
+docker compose ps                              # confirm "healthy"
+docker compose --profile prod down             # stop
+```
+
+Toggle Funnel exposure (modern CLI):
+
+```bash
+sudo tailscale funnel --bg 8000           # ON  — exposes container as https://<host>.ts.net
+sudo tailscale funnel reset               # OFF — removes all funnel rules
+sudo tailscale funnel status              # check what's currently exposed
+```
+
+Rate limit is configurable via the `RATE_LIMIT` env var (default `300/minute` per IP via `compose.yaml`; module default in `app/ratelimit.py` is `60/minute`). Override per-deploy with `RATE_LIMIT=... docker compose ...` before `up`.
+
+**Habit:** after every lab, run `sudo tailscale serve status` to confirm Funnel is off. The container can keep running on the tailnet, but nothing should be public outside lab hours.
+
 ## Endpoints
 
 | Endpoint              | Method | Purpose                                     |
