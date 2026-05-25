@@ -39,3 +39,5 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
+# Personal solution to the lab — kept local, not shared with students
+my_client.py

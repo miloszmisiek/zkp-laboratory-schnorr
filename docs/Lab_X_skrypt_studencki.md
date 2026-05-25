@@ -138,7 +138,7 @@ Zaimplementuj protokół identyfikacji Schnorra zgodnie z opisem w sekcji 1.4 or
 
 **Część A: lokalna implementacja.**
 
-1. Pobierz parametry $(p, q, g)$ z serwera (`GET /params`). Zweryfikuj lokalnie:
+1. Pobierz parametry $(p, q, g)$ z serwera (`GET /v1/params`). Zweryfikuj lokalnie:
    - $g^q \equiv 1 \pmod{p}$ (generator ma rząd dzielący $q$);
    - $g \neq 1$.
 2. Zaimplementuj funkcję `keygen()` zwracającą parę $(x_{\mathrm{priv}}, y)$, gdzie $x_{\mathrm{priv}} \in_R \{1, \ldots, q-1\}$ oraz $y = g^{x_{\mathrm{priv}}} \bmod p$.
@@ -163,7 +163,7 @@ Zaimplementuj protokół identyfikacji Schnorra zgodnie z opisem w sekcji 1.4 or
 
 **Demonstracja do oceny.** Live demo przed prowadzącym składa się z trzech kroków wykonanych na żywo na uruchomionym kliencie:
 
-1. Rejestracja konta studenta (np. `nazwisko@lab`) — odpowiedź $200$;
+1. Rejestracja konta studenta (np. `nazwisko@lab`) — odpowiedź $201$;
 2. Udane uwierzytelnienie — odpowiedź $200$ z tokenem sesji;
 3. Próba uwierzytelnienia z podstawioną fałszywą wartością $z$ (np. zwiększoną o $1$) — odpowiedź $401$.
 
@@ -224,7 +224,7 @@ W laboratorium przyjmujemy $t = 256$ bitów, tj. $e \in_R \{0, \ldots, 2^{256}-1
 
 | Endpoint            | Metoda | Cel                                              |
 |---------------------|--------|--------------------------------------------------|
-| `/params`           | GET    | parametry grupy $(p, q, g)$                      |
+| `/v1/params`        | GET    | parametry grupy $(p, q, g)$                      |
 | `/v1/register`      | POST   | rejestracja konta z kluczem publicznym $y$       |
 | `/v1/login/start`   | POST   | rozpoczęcie uwierzytelnienia (commitment $a$)    |
 | `/v1/login/finish`  | POST   | zakończenie uwierzytelnienia (response $z$)      |
